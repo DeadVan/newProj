@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="warn" name="log" packages="">
+    <Appenders>
+        <File name="LogT" fileName="${sys:catalina.home}/logs/app.log">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %level %t %c %X{uniqID} methodName=%M%X{responseCode}%X{responseTime} {{{ %msg }}} %n" />
+        </File>
+    </Appenders>
+    <Root level="all">
+        <AppenderRef ref="Log"/>
+    </Root>
+</Configuration>

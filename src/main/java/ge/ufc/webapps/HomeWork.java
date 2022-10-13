@@ -1,5 +1,8 @@
 package ge.ufc.webapps;
 
+import ge.ufc.webapps.exception.AccessForbiddenException;
+import ge.ufc.webapps.exception.PersonAlreadyExistsException;
+import ge.ufc.webapps.exception.PersonNotFoundException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -33,13 +36,11 @@ public class HomeWork implements Service {
 
 
     @Override
-    public Response getPerson(int id, String username, String password, @Context HttpServletRequest request) {
+    public Response getPerson(int id, String username, String password, @Context HttpServletRequest request) throws AccessForbiddenException {
         if (FileConf.getDatabase().equals("") || FileConf.getPassword().equals("") || FileConf.getUsername().equals("")) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
-        if (!isValidIp(request.getRemoteAddr())) {
-            return Response.status(Response.Status.FORBIDDEN).build();
-        }
+        if (!isValidIp(request.getRemoteAddr())) throw new AccessForbiddenException();
         if (!FileConf.getPassword().equals(password) || !username.equals(FileConf.getUsername())) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
@@ -52,20 +53,14 @@ public class HomeWork implements Service {
     }
 
     @Override
-    public Response addPerson(Person person, String username, String password, @Context HttpServletRequest request) {
+    public Response addPerson(Person person, String username, String password, @Context HttpServletRequest request) throws AccessForbiddenException, PersonAlreadyExistsException, PersonNotFoundException {
         if (FileConf.getDatabase().equals("") || FileConf.getPassword().equals("") || FileConf.getUsername().equals("")) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
-        if (!isValidIp(request.getRemoteAddr())) {
-            return Response.status(Response.Status.FORBIDDEN).build();
-        }
-        if (!FileConf.getPassword().equals(password) || !username.equals(FileConf.getUsername())) {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
-        }
+        if (!isValidIp(request.getRemoteAddr())) throw new AccessForbiddenException();
+        if (!FileConf.getPassword().equals(password) || !username.equals(FileConf.getUsername())) throw new PersonAlreadyExistsException();
 
-        if (hashMap.get(person.id) != null) {
-            return Response.status(Response.Status.CONFLICT).build();
-        }
+        if (hashMap.get(person.id) != null) throw new PersonNotFoundException();
 
         if (person.firstname == null || person.lastname == null || person.age == 0 || person.id == 0) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -87,13 +82,11 @@ public class HomeWork implements Service {
     }
 
     @Override
-    public Response updatePerson(Person person, String username, String password, @Context HttpServletRequest request) {
+    public Response updatePerson(Person person, String username, String password, @Context HttpServletRequest request) throws AccessForbiddenException, PersonNotFoundException {
         if (FileConf.getDatabase().equals("") || FileConf.getPassword().equals("") || FileConf.getUsername().equals("")) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
-        if (!isValidIp(request.getRemoteAddr())) {
-            return Response.status(Response.Status.FORBIDDEN).build();
-        }
+        if (!isValidIp(request.getRemoteAddr())) throw new AccessForbiddenException();
         if (!FileConf.getPassword().equals(password) || !username.equals(FileConf.getUsername())) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
@@ -101,9 +94,7 @@ public class HomeWork implements Service {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        if (person.firstname == null || person.lastname == null || person.age == 0 || person.id == 0) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        }
+        if (person.firstname == null || person.lastname == null || person.age == 0 || person.id == 0) throw new PersonNotFoundException();
 
         hashMap.put(person.id, person);
         persons.setPersonList(new ArrayList<>(hashMap.values()));
@@ -122,13 +113,11 @@ public class HomeWork implements Service {
     }
 
     @Override
-    public Response deletePerson(int id, String username, String password, @Context HttpServletRequest request) {
+    public Response deletePerson(int id, String username, String password, @Context HttpServletRequest request) throws AccessForbiddenException {
         if (FileConf.getDatabase().equals("") || FileConf.getPassword().equals("") || FileConf.getUsername().equals("")) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
-        if (!isValidIp(request.getRemoteAddr())) {
-            return Response.status(Response.Status.FORBIDDEN).build();
-        }
+        if (!isValidIp(request.getRemoteAddr())) throw new AccessForbiddenException();
         if (!FileConf.getPassword().equals(password) || !username.equals(FileConf.getUsername())) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
@@ -153,13 +142,11 @@ public class HomeWork implements Service {
     }
 
     @Override
-    public Response listPersons(String username, String password, @Context HttpServletRequest request) {
+    public Response listPersons(String username, String password, @Context HttpServletRequest request) throws AccessForbiddenException {
         if (FileConf.getDatabase().equals("") || FileConf.getPassword().equals("") || FileConf.getUsername().equals("")) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
-        if (!isValidIp(request.getRemoteAddr())) {
-            return Response.status(Response.Status.FORBIDDEN).build();
-        }
+        if (!isValidIp(request.getRemoteAddr())) throw new AccessForbiddenException();
         if (!FileConf.getPassword().equals(password) || !username.equals(FileConf.getUsername())) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
